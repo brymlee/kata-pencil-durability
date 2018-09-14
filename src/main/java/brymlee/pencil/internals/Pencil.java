@@ -9,11 +9,14 @@ import static java.util.stream.IntStream.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 public interface Pencil {
-    Paper paper();
-    Integer degradation();
 
-    static Pencil pencil(final Paper paper,
-                         final Integer degradation){
+    Paper paper();
+    Integer durability();
+    Integer maxDurability();
+
+    default Pencil pencil(final Paper paper,
+                          final Integer durability){
+        final Integer maxDurability = maxDurability();
         return new Pencil(){
             @Override
             public Paper paper() {
@@ -21,22 +24,27 @@ public interface Pencil {
             }
 
             @Override
-            public Integer degradation() {
-                return degradation;
+            public Integer durability() {
+                return durability;
+            }
+
+            @Override
+            public Integer maxDurability() {
+                return maxDurability;
             }
         };
     }
 
-    default Integer newDegradation(final Character character){
+    default Integer newDurability(final Character character){
         if(character.toString().trim().equals("")){
-            return degradation();
+            return durability();
         }else if(isNumeric(character.toString())
               || isAllLowerCase(character.toString())){
-            return degradation() - 1;
+            return durability() - 1;
         }else if(isAllUpperCase(character.toString())){
-            return degradation() - 2;
+            return durability() - 2;
         }else if(!isAlphanumeric(character.toString())) {
-            return degradation() - 1;
+            return durability() - 1;
         }else{
             throw new IllegalArgumentException("This pencil cannot write the character inputted. You must only write spaces or alphanumeric characters.");
         }
@@ -44,8 +52,8 @@ public interface Pencil {
 
     default Paper newPaper(final List<Character> characters){
         final Supplier<Paper> paperWithAddedSpace = () -> () -> paper().text().concat(" ");
-        final Boolean hasDegradated = !newDegradation(characters.get(0)).equals(degradation());
-        final Boolean isCompletelyDegradated = Integer.valueOf(0).equals(degradation());
+        final Boolean hasDegradated = !newDurability(characters.get(0)).equals(durability());
+        final Boolean isCompletelyDegradated = Integer.valueOf(0).equals(durability());
         if(isCompletelyDegradated){
             return paperWithAddedSpace.get();
         }else if(hasDegradated){
@@ -62,11 +70,11 @@ public interface Pencil {
             return pencil(newPaper(characters), 0)
                 .write(ImmutableList.<Character>of());
         }else{
-            final Integer degradation = newDegradation(characters.get(0));
+            final Integer durability = newDurability(characters.get(0));
             final List<Character> newCharacters = range(1, characters.size())
                 .mapToObj(index -> characters.get(index))
                 .collect(toList());
-            return pencil(newPaper(characters), degradation)
+            return pencil(newPaper(characters), durability)
                 .write(newCharacters);
         }
     }
@@ -87,4 +95,7 @@ public interface Pencil {
         return write(joinedText);
     }
 
+    default Pencil sharpen(){
+        return pencil(paper(), maxDurability());
+    }
 }

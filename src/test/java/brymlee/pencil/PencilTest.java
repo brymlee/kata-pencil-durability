@@ -11,13 +11,22 @@ import static java.util.stream.Collectors.*;
 
 public class PencilTest {
 
-    private static void basicWritingAssertion(final String initialText,
-                                              final String assertableText,
-                                              final Integer degradation,
-                                              final String ... textToWrite ){
+    private static brymlee.pencil.internals.Pencil basicWritingAssertion(final String initialText,
+                                                                         final String assertableText,
+                                                                         final Integer durability,
+                                                                         final String ... textToWrite ){
         final Paper paper = () -> initialText;
-        final Pencil pencil = Pencil.create(degradation, paper);
-        assertEquals(assertableText, pencil.write(textToWrite).paper().text());
+        final brymlee.pencil.internals.Pencil pencil = Pencil.create(durability, paper).write(textToWrite);
+        assertEquals(assertableText, pencil.paper().text());
+        return pencil;
+    }
+
+    private static brymlee.pencil.internals.Pencil basicWritingAssertion(final brymlee.pencil.internals.Pencil pencil,
+                                                                         final String assertableText,
+                                                                         final String ... textToWrite){
+        final brymlee.pencil.internals.Pencil newPencil = pencil.write(textToWrite);
+        assertEquals(assertableText, newPencil.paper().text());
+        return newPencil;
     }
 
     @Test
@@ -44,4 +53,11 @@ public class PencilTest {
     public void canPencilRunOutOfGraphiteAndOnlyWriteSpaces(){
         basicWritingAssertion("", "Tex ", 4, "Text");
     }
+
+    @Test
+    public void canPencilBeSharpenedAndBeReusedAfterwards(){
+        final brymlee.pencil.internals.Pencil pencil = basicWritingAssertion("", "Goo ", 4, "Good").sharpen();
+        basicWritingAssertion(pencil, "Goo jell ", "jelly");
+    }
+
 }

@@ -4,16 +4,18 @@ import brymlee.pencil.internals.Paper;
 
 public class Pencil implements brymlee.pencil.internals.Pencil {
 
-    private Integer degradation;
+    private Integer maxDurability;
+    private Integer durability;
     private Paper paper;
 
     private Pencil(){
 
     }
 
-    private Pencil(final Integer degradation,
+    private Pencil(final Integer durability,
                    final Paper paper){
-        this.degradation = degradation;
+        this.maxDurability = durability;
+        this.durability = durability;
         this.paper = paper;
     }
 
@@ -28,7 +30,12 @@ public class Pencil implements brymlee.pencil.internals.Pencil {
     }
 
     @Override
-    public Integer degradation() {
-        return this.degradation;
+    public Integer durability() {
+        return this.durability;
+    }
+
+    @Override
+    public Integer maxDurability(){
+        return this.durability;
     }
 }

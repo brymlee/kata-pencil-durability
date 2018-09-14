@@ -1,4 +1,4 @@
-package brymlee.pencil;
+package brymlee.pencil.internals;
 
 @FunctionalInterface
 public interface Paper {

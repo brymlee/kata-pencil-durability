@@ -1,21 +1,34 @@
 package brymlee.pencil;
 
-import static java.util.stream.IntStream.*;
+import brymlee.pencil.internals.Paper;
 
-@FunctionalInterface
-public interface Pencil {
-    Paper paper();
+public class Pencil implements brymlee.pencil.internals.Pencil {
 
-    default Pencil write(final String text){
-        final Paper paper = () -> paper().text().concat(text);
-        return () -> paper;
+    private Integer degradation;
+    private Paper paper;
+
+    private Pencil(){
+
     }
 
-    default Pencil write(final String[] text){
-        final String joinedText = range(0, text.length)
-            .mapToObj(index -> text[index])
-            .reduce((i, j) -> i.concat(j))
-            .get();
-        return write(joinedText);
+    private Pencil(final Integer degradation,
+                   final Paper paper){
+        this.degradation = degradation;
+        this.paper = paper;
+    }
+
+    public static Pencil create(final Integer degredation,
+                                final Paper paper) {
+        return new Pencil(degredation, paper);
+    }
+
+    @Override
+    public Paper paper() {
+        return this.paper;
+    }
+
+    @Override
+    public Integer degradation() {
+        return this.degradation;
     }
 }

@@ -7,21 +7,25 @@ public class Pencil implements brymlee.pencil.internals.Pencil {
     private Integer maxDurability;
     private Integer durability;
     private Paper paper;
+    private Integer length;
 
     private Pencil(){
 
     }
 
     private Pencil(final Integer durability,
-                   final Paper paper){
+                   final Paper paper,
+                   final Integer length){
         this.maxDurability = durability;
         this.durability = durability;
         this.paper = paper;
+        this.length = length;
     }
 
-    public static Pencil create(final Integer degredation,
-                                final Paper paper) {
-        return new Pencil(degredation, paper);
+    public static Pencil create(final Integer durability,
+                                final Paper paper,
+                                final Integer length) {
+        return new Pencil( durability, paper, length);
     }
 
     @Override
@@ -37,5 +41,10 @@ public class Pencil implements brymlee.pencil.internals.Pencil {
     @Override
     public Integer maxDurability(){
         return this.durability;
+    }
+
+    @Override
+    public Integer length() {
+        return this.length;
     }
 }

@@ -13,9 +13,11 @@ public interface Pencil {
     Paper paper();
     Integer durability();
     Integer maxDurability();
+    Integer length();
 
     default Pencil pencil(final Paper paper,
-                          final Integer durability){
+                          final Integer durability,
+                          final Integer length){
         final Integer maxDurability = maxDurability();
         return new Pencil(){
             @Override
@@ -31,6 +33,11 @@ public interface Pencil {
             @Override
             public Integer maxDurability() {
                 return maxDurability;
+            }
+
+            @Override
+            public Integer length() {
+                return length;
             }
         };
     }
@@ -67,14 +74,14 @@ public interface Pencil {
         if(characters.size() < 1){
             return this;
         }else if(characters.size() == 1){
-            return pencil(newPaper(characters), 0)
+            return pencil(newPaper(characters), 0, length())
                 .write(ImmutableList.<Character>of());
         }else{
             final Integer durability = newDurability(characters.get(0));
             final List<Character> newCharacters = range(1, characters.size())
                 .mapToObj(index -> characters.get(index))
                 .collect(toList());
-            return pencil(newPaper(characters), durability)
+            return pencil(newPaper(characters), durability, length())
                 .write(newCharacters);
         }
     }
@@ -96,6 +103,10 @@ public interface Pencil {
     }
 
     default Pencil sharpen(){
-        return pencil(paper(), maxDurability());
+        if(length() > 0){
+            return pencil(paper(), maxDurability(), length() - 1);
+        }else{
+            return pencil(paper(), durability(), length());
+        }
     }
 }

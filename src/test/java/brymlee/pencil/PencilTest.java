@@ -16,9 +16,10 @@ public class PencilTest {
                                                          final String assertableText,
                                                          final Integer durability,
                                                          final Integer length,
+                                                         final Integer eraserDurability,
                                                          final String ... textToWrite ){
         final Paper paper = () -> initialText;
-        final PencilInterface pencil = Pencil.create(durability, paper, length).write(textToWrite);
+        final PencilInterface pencil = Pencil.create(durability, paper, length, eraserDurability).write(textToWrite);
         assertEquals(assertableText, pencil.paper().text());
         return pencil;
     }
@@ -33,12 +34,12 @@ public class PencilTest {
 
     @Test
     public void canPencilWriteOnABlankPieceOfPaper(){
-        basicWritingAssertion("", "Functional programming is very fun.", 100, 1, "Functional programming is very fun.");
+        basicWritingAssertion("", "Functional programming is very fun.", 100, 1, 0,"Functional programming is very fun.");
     }
 
     @Test
     public void canPencilWriteOnPaperWithExistingText(){
-        basicWritingAssertion("She sells sea shells","She sells sea shells down by the sea shore", 100, 1," down by the sea shore");
+        basicWritingAssertion("She sells sea shells","She sells sea shells down by the sea shore", 100, 1, 0, " down by the sea shore");
     }
 
     @Test
@@ -48,40 +49,46 @@ public class PencilTest {
             .map(integer -> integer.toString())
             .collect(toList());
         final String[] text = from(textList).toArray(String.class);
-        basicWritingAssertion("", "012345678910", 100, 1, text);
+        basicWritingAssertion("", "012345678910", 100, 1, 0, text);
     }
 
     @Test
     public void canPencilRunOutOfGraphiteAndOnlyWriteSpaces(){
-        basicWritingAssertion("", "Tex ", 4, 1, "Text");
+        basicWritingAssertion("", "Tex ", 4, 1, 0, "Text");
     }
 
     @Test
     public void canPencilBeSharpenedAndBeReusedAfterwards(){
-        final PencilInterface pencil = basicWritingAssertion("", "Goo ", 4, 1, "Good").sharpen();
+        final PencilInterface pencil = basicWritingAssertion("", "Goo ", 4, 1, 0, "Good").sharpen();
         basicWritingAssertion(pencil, "Goo jell ", "jelly");
     }
 
     @Test
     public void canPencilBeSharpenedOnlyASetNumberOfTimes(){
-        final PencilInterface sharpenedPencil = basicWritingAssertion("", "abcd ", 4, 1, "abcde").sharpen();
+        final PencilInterface sharpenedPencil = basicWritingAssertion("", "abcd ", 4, 1, 0, "abcde").sharpen();
         final PencilInterface dullPencil = basicWritingAssertion(sharpenedPencil, "abcd fghi ", "fghij").sharpen();
         basicWritingAssertion(dullPencil, "abcd fghi  ", "k");
     }
 
     @Test
     public void canPencilEraseInstancesOfMistakes(){
-        final PencilInterface pencil = basicWritingAssertion("", "good boy good boy", 50, 1, "good boy good boy");
+        final PencilInterface pencil = basicWritingAssertion("", "good boy good boy", 50, 1, 1000, "good boy good boy");
         assertEquals("good     good    ", pencil.erase("boy").erase("boy").paper().text());
     }
 
     @Test
     public void canPencilEraseInstancesOfMistakes_woodchuckExample(){
-        final PencilInterface pencil = basicWritingAssertion("", "How much wood would a woodchuck chuck if a woodchuck could chuck wood?", 1000, 1, "How much wood would a woodchuck chuck if a woodchuck could chuck wood?");
+        final PencilInterface pencil = basicWritingAssertion("", "How much wood would a woodchuck chuck if a woodchuck could chuck wood?", 1000, 1, 1000, "How much wood would a woodchuck chuck if a woodchuck could chuck wood?");
         final PencilInterface firstChuckErased = pencil.erase("chuck");
         assertEquals("How much wood would a woodchuck chuck if a woodchuck could       wood?", firstChuckErased.paper().text());
         final PencilInterface secondChuckErased = firstChuckErased.erase("chuck");
         assertEquals("How much wood would a woodchuck chuck if a wood      could       wood?", secondChuckErased.paper().text());
+    }
+
+    @Test
+    public void canPencilEraserDegradeWhenErasingTooMuch(){
+        final PencilInterface pencil = basicWritingAssertion("", "Buffalo Bill", 1000, 1, 3, "Buffalo Bill");
+        assertEquals("Buffalo B   ", pencil.erase("Bill").paper().text());
     }
 
 }

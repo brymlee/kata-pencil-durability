@@ -4,6 +4,7 @@ import brymlee.pencil.internals.Paper;
 
 public class Pencil implements brymlee.pencil.internals.PencilInterface {
 
+    private Integer eraserDurability;
     private Integer maxDurability;
     private Integer durability;
     private Paper paper;
@@ -15,17 +16,20 @@ public class Pencil implements brymlee.pencil.internals.PencilInterface {
 
     private Pencil(final Integer durability,
                    final Paper paper,
-                   final Integer length){
+                   final Integer length,
+                   final Integer eraserDurability){
         this.maxDurability = durability;
         this.durability = durability;
         this.paper = paper;
         this.length = length;
+        this.eraserDurability = eraserDurability;
     }
 
     public static Pencil create(final Integer durability,
                                 final Paper paper,
-                                final Integer length) {
-        return new Pencil( durability, paper, length);
+                                final Integer length,
+                                final Integer eraserDurability) {
+        return new Pencil( durability, paper, length, eraserDurability);
     }
 
     @Override
@@ -46,5 +50,10 @@ public class Pencil implements brymlee.pencil.internals.PencilInterface {
     @Override
     public Integer length() {
         return this.length;
+    }
+
+    @Override
+    public Integer eraserDurability() {
+        return this.eraserDurability;
     }
 }

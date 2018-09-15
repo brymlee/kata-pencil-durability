@@ -18,10 +18,12 @@ public interface PencilInterface {
     Integer durability();
     Integer maxDurability();
     Integer length();
+    Integer eraserDurability();
 
     default PencilInterface pencil(final Paper paper,
                                    final Integer durability,
-                                   final Integer length){
+                                   final Integer length,
+                                   final Integer eraserDurability){
         final Integer maxDurability = maxDurability();
         return new PencilInterface(){
             @Override
@@ -42,6 +44,11 @@ public interface PencilInterface {
             @Override
             public Integer length() {
                 return length;
+            }
+
+            @Override
+            public Integer eraserDurability() {
+                return eraserDurability;
             }
         };
     }
@@ -78,14 +85,14 @@ public interface PencilInterface {
         if(characters.size() < 1){
             return this;
         }else if(characters.size() == 1){
-            return pencil(newPaper(characters), 0, length())
+            return pencil(newPaper(characters), 0, length(), eraserDurability())
                 .write(ImmutableList.<Character>of());
         }else{
             final Integer durability = newDurability(characters.get(0));
             final List<Character> newCharacters = range(1, characters.size())
                 .mapToObj(index -> characters.get(index))
                 .collect(toList());
-            return pencil(newPaper(characters), durability, length())
+            return pencil(newPaper(characters), durability, length(), eraserDurability())
                 .write(newCharacters);
         }
     }
@@ -108,33 +115,38 @@ public interface PencilInterface {
 
     default PencilInterface sharpen(){
         if(length() > 0){
-            return pencil(paper(), maxDurability(), length() - 1);
+            return pencil(paper(), maxDurability(), length() - 1, eraserDurability());
         }else{
-            return pencil(paper(), durability(), length());
+            return pencil(paper(), durability(), length(), eraserDurability());
         }
     }
 
     default PencilInterface erase(final String textToErase){
         if(paper().text().contains(textToErase)){
-            return erase(paper().text().length() - 1, textToErase, "", ImmutableList.of());
+            return erase(paper().text().length() - 1, textToErase, "", ImmutableList.of(), eraserDurability());
         }else{
-            return pencil(paper(), durability(), length());
+            return pencil(paper(), durability(), length(), eraserDurability());
         }
     }
 
     default PencilInterface erase(final Integer index,
                                   final String textToErase,
                                   final String buffer,
-                                  final List<Integer> indexBuffer){
+                                  final List<Integer> indexBuffer,
+                                  final Integer eraserDurability){
         final Supplier<String> newBuffer = () -> buffer.concat(paper().text().substring(index, index + 1));
         final Supplier<List<Integer>> newIndexBuffer = () -> ImmutableList.<Integer>builder()
             .addAll(indexBuffer)
             .add(index)
             .build();
+        final Supplier<Integer> newEraserDurability = () -> paper().text().charAt(index) == ' ' ? eraserDurability : eraserDurability - 1;
         final Supplier<String> newText = () -> range(0, paper().text().length())
             .mapToObj(i -> i)
             .map(i -> {
-                if(indexBuffer.stream().anyMatch(j -> i.equals(j))){
+                if(i.equals(index)
+                && newEraserDurability.get().equals(eraserDurability)){
+                    return paper().text().charAt(i);
+                }else if(indexBuffer.stream().anyMatch(j -> i.equals(j))){
                     return ' ';
                 }else{
                     return paper().text().charAt(i);
@@ -143,12 +155,13 @@ public interface PencilInterface {
             .reduce((i, j) -> i.concat(j))
             .get();
         if(buffer.length() == textToErase.length()
-        || index < 0){
-            return pencil(() -> newText.get(), durability(), length());
+        || index < 0
+        || eraserDurability < 1){
+            return pencil(() -> newText.get(), durability(), length(), eraserDurability);
         }else if(isBufferTextSubsetOfTextToErase(newBuffer.get(), textToErase)){
-            return erase(index - 1, textToErase, newBuffer.get(), newIndexBuffer.get());
+            return erase(index - 1, textToErase, newBuffer.get(), newIndexBuffer.get(), newEraserDurability.get());
         }else{
-            return erase(index - 1, textToErase, "", indexBuffer);
+            return erase(index - 1, textToErase, "", indexBuffer, eraserDurability);
         }
     }
 

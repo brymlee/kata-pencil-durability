@@ -1,25 +1,29 @@
 package brymlee.pencil.internals;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.Stack;
 
 import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
-public interface Pencil {
+public interface PencilInterface {
 
     Paper paper();
     Integer durability();
     Integer maxDurability();
     Integer length();
 
-    default Pencil pencil(final Paper paper,
-                          final Integer durability,
-                          final Integer length){
+    default PencilInterface pencil(final Paper paper,
+                                   final Integer durability,
+                                   final Integer length){
         final Integer maxDurability = maxDurability();
-        return new Pencil(){
+        return new PencilInterface(){
             @Override
             public Paper paper() {
                 return paper;
@@ -70,7 +74,7 @@ public interface Pencil {
         }
     }
 
-    default Pencil write(final List<Character> characters){
+    default PencilInterface write(final List<Character> characters){
         if(characters.size() < 1){
             return this;
         }else if(characters.size() == 1){
@@ -86,7 +90,7 @@ public interface Pencil {
         }
     }
 
-    default Pencil write(final String text){
+    default PencilInterface write(final String text){
         final char[] charArray = text.toCharArray();
         final List<Character> characters = range(0, charArray.length)
             .mapToObj(index -> charArray[index])
@@ -94,7 +98,7 @@ public interface Pencil {
         return write(characters);
     }
 
-    default Pencil write(final String[] text){
+    default PencilInterface write(final String[] text){
         final String joinedText = range(0, text.length)
             .mapToObj(index -> text[index])
             .reduce((i, j) -> i.concat(j))
@@ -102,11 +106,57 @@ public interface Pencil {
         return write(joinedText);
     }
 
-    default Pencil sharpen(){
+    default PencilInterface sharpen(){
         if(length() > 0){
             return pencil(paper(), maxDurability(), length() - 1);
         }else{
             return pencil(paper(), durability(), length());
         }
+    }
+
+    default PencilInterface erase(final String textToErase){
+        if(paper().text().contains(textToErase)){
+            return erase(paper().text().length() - 1, textToErase, "", ImmutableList.of());
+        }else{
+            return pencil(paper(), durability(), length());
+        }
+    }
+
+    default PencilInterface erase(final Integer index,
+                                  final String textToErase,
+                                  final String buffer,
+                                  final List<Integer> indexBuffer){
+        final Supplier<String> newBuffer = () -> buffer.concat(paper().text().substring(index, index + 1));
+        final Supplier<List<Integer>> newIndexBuffer = () -> ImmutableList.<Integer>builder()
+            .addAll(indexBuffer)
+            .add(index)
+            .build();
+        final Supplier<String> newText = () -> range(0, paper().text().length())
+            .mapToObj(i -> i)
+            .map(i -> {
+                if(indexBuffer.stream().anyMatch(j -> i.equals(j))){
+                    return ' ';
+                }else{
+                    return paper().text().charAt(i);
+                }
+            }).map(character -> character.toString())
+            .reduce((i, j) -> i.concat(j))
+            .get();
+        if(buffer.length() == textToErase.length()
+        || index < 0){
+            return pencil(() -> newText.get(), durability(), length());
+        }else if(isBufferTextSubsetOfTextToErase(newBuffer.get(), textToErase)){
+            return erase(index - 1, textToErase, newBuffer.get(), newIndexBuffer.get());
+        }else{
+            return erase(index - 1, textToErase, "", indexBuffer);
+        }
+    }
+
+    static Boolean isBufferTextSubsetOfTextToErase(final String bufferText, final String textToErase){
+        final Supplier<String> reversedBufferText = () -> reverse(bufferText);
+        final Function<Integer, Integer> bufferIndex = index -> reversedBufferText.get().length() - 1 - index;
+        final Function<Integer, Integer> textToEraseIndex = index -> textToErase.length() - 1 - index;
+        return range(0, bufferText.length())
+            .allMatch(index -> reversedBufferText.get().charAt(bufferIndex.apply(index)) == textToErase.charAt(textToEraseIndex.apply(index)));
     }
 }

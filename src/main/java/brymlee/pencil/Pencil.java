@@ -2,7 +2,7 @@ package brymlee.pencil;
 
 import brymlee.pencil.internals.Paper;
 
-public class Pencil implements brymlee.pencil.internals.Pencil {
+public class Pencil implements brymlee.pencil.internals.PencilInterface {
 
     private Integer maxDurability;
     private Integer durability;

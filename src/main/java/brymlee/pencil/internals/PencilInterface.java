@@ -52,7 +52,7 @@ public interface PencilInterface {
         };
     }
 
-    static Integer newDurability(final Character character,
+    default Integer newDurability(final Character character,
                                  final Integer durability){
         if(character.toString().trim().equals("")){
             return durability;
@@ -81,36 +81,10 @@ public interface PencilInterface {
         }
     }
 
-    default PencilInterface write(final List<Character> characters){
-        if(characters.size() < 1){
-            return this;
-        }else if(characters.size() == 1){
-            return pencil(newPaper(characters), durability(), length(), eraserDurability(), maxDurability())
-                .write(ImmutableList.<Character>of());
-        }else{
-            final Integer durability = newDurability(characters.get(0), durability());
-            final List<Character> newCharacters = range(1, characters.size())
-                .mapToObj(index -> characters.get(index))
-                .collect(toList());
-            return pencil(newPaper(characters), durability, length(), eraserDurability(), maxDurability())
-                .write(newCharacters);
-        }
-    }
-
-    default PencilInterface write(final String text){
-        final char[] charArray = text.toCharArray();
-        final List<Character> characters = range(0, charArray.length)
-            .mapToObj(index -> charArray[index])
-            .collect(toList());
-        return write(characters);
-    }
 
     default PencilInterface write(final String[] text){
-        final String joinedText = range(0, text.length)
-            .mapToObj(index -> text[index])
-            .reduce((i, j) -> i.concat(j))
-            .get();
-        return write(joinedText);
+        final WriteTemplate writeTemplate = () -> this;
+        return writeTemplate.write(text);
     }
 
     default PencilInterface sharpen(){

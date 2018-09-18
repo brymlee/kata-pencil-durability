@@ -54,7 +54,7 @@ public interface EditTemplate{
         if (textCount >= textToEdit.length()) {
             return PencilInterface.pencil(newPaper.get(), durability, pencil().length(), pencil().eraserDurability(), pencil().maxDurability());
         } else {
-            return edit(startIndex + 1, textCount + 1, newDurability(newReplacementCharacter.get(), durability), textToEdit, newReplacementCharacters.get());
+            return edit(startIndex + 1, textCount + 1, pencil().newDurability(newReplacementCharacter.get(), durability), textToEdit, newReplacementCharacters.get());
         }
     }
 }

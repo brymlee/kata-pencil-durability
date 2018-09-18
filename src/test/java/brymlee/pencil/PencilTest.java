@@ -91,4 +91,10 @@ public class PencilTest {
         assertEquals("Buffalo B   ", pencil.erase("Bill").paper().text());
     }
 
+    @Test
+    public void canPencilEditExistingTextWithoutAlwaysAppending(){
+        final PencilInterface pencil = basicWritingAssertion("", "An       a day keeps the doctor away", 1000, 1, 0, "An       a day keeps the doctor away");
+        assertEquals("An onion a day keeps the doctor away", pencil.edit(3, "onion").paper().text());
+    }
+
 }

@@ -1,9 +1,6 @@
 package brymlee.pencil;
 
-import brymlee.pencil.internals.Editor;
-import brymlee.pencil.internals.Paper;
-import brymlee.pencil.internals.Sharpener;
-import brymlee.pencil.internals.Writer;
+import brymlee.pencil.internals.*;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
 import java.util.function.Function;
@@ -102,56 +99,8 @@ public interface Pencil {
     }
 
     default Pencil erase(final String textToErase){
-        if(paper().text().contains(textToErase)){
-            return erase(paper().text().length() - 1, textToErase, "", ImmutableList.of(), eraserDurability());
-        }else{
-            return newPencil(paper(), durability(), length(), eraserDurability(), maxDurability());
-        }
-    }
-
-    default Pencil erase(final Integer index,
-                                final String textToErase,
-                                final String buffer,
-                                final List<Integer> indexBuffer,
-                                final Integer eraserDurability){
-        final Supplier<String> newBuffer = () -> buffer.concat(paper().text().substring(index, index + 1));
-        final Supplier<List<Integer>> newIndexBuffer = () -> ImmutableList.<Integer>builder()
-            .addAll(indexBuffer)
-            .add(index)
-            .build();
-        final Supplier<Integer> newEraserDurability = () -> paper().text().charAt(index) == ' ' ? eraserDurability : eraserDurability - 1;
-        final Supplier<String> newText = () -> range(0, paper().text().length())
-            .mapToObj(i -> i)
-            .map(i -> {
-                if(i.equals(index)
-                && newEraserDurability.get().equals(eraserDurability)){
-                    return paper().text().charAt(i);
-                }else if(indexBuffer.stream().anyMatch(j -> i.equals(j))){
-                    return ' ';
-                }else{
-                    return paper().text().charAt(i);
-                }
-            }).map(character -> character.toString())
-            .reduce((i, j) -> i.concat(j))
-            .get();
-        if(buffer.length() == textToErase.length()
-        || index < 0
-        || eraserDurability < 1){
-            return newPencil(() -> newText.get(), durability(), length(), eraserDurability, maxDurability());
-        }else if(isBufferTextSubsetOfTextToErase(newBuffer.get(), textToErase)){
-            return erase(index - 1, textToErase, newBuffer.get(), newIndexBuffer.get(), newEraserDurability.get());
-        }else{
-            return erase(index - 1, textToErase, "", indexBuffer, eraserDurability);
-        }
-    }
-
-    static Boolean isBufferTextSubsetOfTextToErase(final String bufferText,
-                                                   final String textToErase){
-        final Supplier<String> reversedBufferText = () -> reverse(bufferText);
-        final Function<Integer, Integer> bufferIndex = index -> reversedBufferText.get().length() - 1 - index;
-        final Function<Integer, Integer> textToEraseIndex = index -> textToErase.length() - 1 - index;
-        return range(0, bufferText.length())
-            .allMatch(index -> reversedBufferText.get().charAt(bufferIndex.apply(index)) == textToErase.charAt(textToEraseIndex.apply(index)));
+        final Eraser eraser = () -> this;
+        return eraser.erase(textToErase);
     }
 
     default Pencil edit(final Integer startIndex,

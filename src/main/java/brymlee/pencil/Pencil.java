@@ -1,12 +1,9 @@
 package brymlee.pencil;
 
 import brymlee.pencil.internals.*;
-import com.google.common.collect.ImmutableList;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static java.util.stream.IntStream.*;
 import static org.apache.commons.lang3.StringUtils.*;
 
 public interface Pencil {

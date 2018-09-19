@@ -1,11 +1,11 @@
 package brymlee.pencil.internals;
 
+import brymlee.pencil.Pencil;
+
 import java.util.function.Supplier;
 
-import static brymlee.pencil.internals.PencilInterface.*;
-
-public interface EditTemplate{
-    PencilInterface pencil();
+public interface Editor {
+    Pencil pencil();
     Integer durability();
 
     default Character newReplacementCharacter(final Integer startIndex,
@@ -43,16 +43,16 @@ public interface EditTemplate{
                    + pencil().paper().text().substring(startIndex);
     }
 
-    default PencilInterface edit(final Integer startIndex,
-                                 final Integer textCount,
-                                 final Integer durability,
-                                 final String textToEdit,
-                                 final String replacementText) {
+    default Pencil edit(final Integer startIndex,
+                        final Integer textCount,
+                        final Integer durability,
+                        final String textToEdit,
+                        final String replacementText) {
         final Supplier<Paper> newPaper = () -> newPaper(startIndex, textToEdit, replacementText);
         final Supplier<Character> newReplacementCharacter = () -> newReplacementCharacter(startIndex, textToEdit, textCount);
         final Supplier<String> newReplacementCharacters = () -> newReplacementCharacters(startIndex, replacementText, textToEdit, textCount);
         if (textCount >= textToEdit.length()) {
-            return PencilInterface.pencil(newPaper.get(), durability, pencil().length(), pencil().eraserDurability(), pencil().maxDurability());
+            return Pencil.pencil(newPaper.get(), durability, pencil().length(), pencil().eraserDurability(), pencil().maxDurability());
         } else {
             return edit(startIndex + 1, textCount + 1, pencil().newDurability(newReplacementCharacter.get(), durability), textToEdit, newReplacementCharacters.get());
         }

@@ -2,6 +2,7 @@ package brymlee.pencil;
 
 import brymlee.pencil.internals.Editor;
 import brymlee.pencil.internals.Paper;
+import brymlee.pencil.internals.Sharpener;
 import brymlee.pencil.internals.Writer;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
@@ -96,11 +97,8 @@ public interface Pencil {
     }
 
     default Pencil sharpen(){
-        if(length() > 0){
-            return newPencil(paper(), maxDurability(), length() - 1, eraserDurability(), maxDurability());
-        }else{
-            return newPencil(paper(), durability(), length(), eraserDurability(), maxDurability());
-        }
+        final Sharpener sharpener = () -> this;
+        return sharpener.sharpen();
     }
 
     default Pencil erase(final String textToErase){

@@ -52,7 +52,7 @@ public interface Editor {
         final Supplier<Character> newReplacementCharacter = () -> newReplacementCharacter(startIndex, textToEdit, textCount);
         final Supplier<String> newReplacementCharacters = () -> newReplacementCharacters(startIndex, replacementText, textToEdit, textCount);
         if (textCount >= textToEdit.length()) {
-            return Pencil.pencil(newPaper.get(), durability, pencil().length(), pencil().eraserDurability(), pencil().maxDurability());
+            return pencil().newPencil(newPaper.get(), durability, pencil().length(), pencil().eraserDurability(), pencil().maxDurability());
         } else {
             return edit(startIndex + 1, textCount + 1, pencil().newDurability(newReplacementCharacter.get(), durability), textToEdit, newReplacementCharacters.get());
         }

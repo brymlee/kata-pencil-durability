@@ -4,7 +4,6 @@ import brymlee.pencil.internals.Editor;
 import brymlee.pencil.internals.Paper;
 import brymlee.pencil.internals.Writer;
 import com.google.common.collect.ImmutableList;
-
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -20,11 +19,11 @@ public interface Pencil {
     Integer length();
     Integer eraserDurability();
 
-    static Pencil pencil(final Paper paper,
-                         final Integer durability,
-                         final Integer length,
-                         final Integer eraserDurability,
-                         final Integer maxDurability){
+    static Pencil newPencilStatic(final Paper paper,
+                                  final Integer durability,
+                                  final Integer length,
+                                  final Integer eraserDurability,
+                                  final Integer maxDurability){
         return new Pencil(){
             @Override
             public Paper paper() {
@@ -51,6 +50,14 @@ public interface Pencil {
                 return eraserDurability;
             }
         };
+    }
+
+    default Pencil newPencil(final Paper paper,
+                             final Integer durability,
+                             final Integer length,
+                             final Integer eraserDurability,
+                             final Integer maxDurability){
+        return newPencilStatic(paper, durability, length, eraserDurability, maxDurability);
     }
 
     default Integer newDurability(final Character character,
@@ -90,9 +97,9 @@ public interface Pencil {
 
     default Pencil sharpen(){
         if(length() > 0){
-            return pencil(paper(), maxDurability(), length() - 1, eraserDurability(), maxDurability());
+            return newPencil(paper(), maxDurability(), length() - 1, eraserDurability(), maxDurability());
         }else{
-            return pencil(paper(), durability(), length(), eraserDurability(), maxDurability());
+            return newPencil(paper(), durability(), length(), eraserDurability(), maxDurability());
         }
     }
 
@@ -100,7 +107,7 @@ public interface Pencil {
         if(paper().text().contains(textToErase)){
             return erase(paper().text().length() - 1, textToErase, "", ImmutableList.of(), eraserDurability());
         }else{
-            return pencil(paper(), durability(), length(), eraserDurability(), maxDurability());
+            return newPencil(paper(), durability(), length(), eraserDurability(), maxDurability());
         }
     }
 
@@ -132,7 +139,7 @@ public interface Pencil {
         if(buffer.length() == textToErase.length()
         || index < 0
         || eraserDurability < 1){
-            return pencil(() -> newText.get(), durability(), length(), eraserDurability, maxDurability());
+            return newPencil(() -> newText.get(), durability(), length(), eraserDurability, maxDurability());
         }else if(isBufferTextSubsetOfTextToErase(newBuffer.get(), textToErase)){
             return erase(index - 1, textToErase, newBuffer.get(), newIndexBuffer.get(), newEraserDurability.get());
         }else{

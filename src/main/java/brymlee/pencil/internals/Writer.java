@@ -15,11 +15,11 @@ public interface Writer {
         if(characters.size() < 1){
             return this;
         }else if(characters.size() == 1){
-            final Pencil pencil = Pencil.pencil(pencil().newPaper(characters),
-                                                                  pencil().durability(),
-                                                                  pencil().length(),
-                                                                  pencil().eraserDurability(),
-                                                                  pencil().maxDurability());
+            final Pencil pencil = pencil().newPencil(pencil().newPaper(characters),
+                                                     pencil().durability(),
+                                                     pencil().length(),
+                                                     pencil().eraserDurability(),
+                                                     pencil().maxDurability());
             final Writer writer = () -> pencil;
             return writer
                 .write(ImmutableList.<Character>of());
@@ -28,11 +28,11 @@ public interface Writer {
             final List<Character> newCharacters = range(1, characters.size())
                 .mapToObj(index -> characters.get(index))
                 .collect(toList());
-            final Pencil pencil = Pencil.pencil(pencil().newPaper(characters),
-                                                                  durability,
-                                                                  pencil().length(),
-                                                                  pencil().eraserDurability(),
-                                                                  pencil().maxDurability());
+            final Pencil pencil = pencil().newPencil(pencil().newPaper(characters),
+                                                     durability,
+                                                     pencil().length(),
+                                                     pencil().eraserDurability(),
+                                                     pencil().maxDurability());
             final Writer writer = () -> pencil;
             return writer
                 .write(newCharacters);

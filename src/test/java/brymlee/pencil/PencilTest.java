@@ -4,6 +4,7 @@ import brymlee.pencil.internals.Paper;
 import org.junit.Test;
 import java.util.List;
 
+import static brymlee.pencil.Pencil.*;
 import static org.junit.Assert.*;
 import static java.util.stream.IntStream.*;
 import static com.google.common.collect.FluentIterable.*;
@@ -12,13 +13,13 @@ import static java.util.stream.Collectors.*;
 public class PencilTest {
 
     private static Pencil basicWritingAssertion(final String initialText,
-                                                       final String assertableText,
-                                                       final Integer durability,
-                                                       final Integer length,
-                                                       final Integer eraserDurability,
-                                                       final String ... textToWrite ){
+                                                final String assertableText,
+                                                final Integer durability,
+                                                final Integer length,
+                                                final Integer eraserDurability,
+                                                final String ... textToWrite ){
         final Paper paper = () -> initialText;
-        final Pencil pencil = Pencil.pencil(paper, durability, length, eraserDurability, durability).write(textToWrite);
+        final Pencil pencil = newPencilStatic(paper, durability, length, eraserDurability, durability).write(textToWrite);
         assertEquals(assertableText, pencil.paper().text());
         return pencil;
     }

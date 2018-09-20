@@ -3,13 +3,19 @@ package brymlee.pencil.internals;
 import brymlee.pencil.Pencil;
 import com.google.common.collect.ImmutableList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import static java.util.stream.Collectors.*;
 import static java.util.stream.IntStream.*;
+import static java.util.Arrays.*;
 
 @FunctionalInterface
 public interface Writer {
     Pencil pencil();
+
+    static <T> IntFunction<T> indexArray(final T[] array){
+        return index -> array[index];
+    }
 
     default Writer write(final List<Character> characters){
         if(characters.size() < 1){
@@ -49,8 +55,8 @@ public interface Writer {
 
     default Pencil write(final String[] text){
         final String joinedText = range(0, text.length)
-            .mapToObj(index -> text[index])
-            .reduce((i, j) -> i.concat(j))
+            .mapToObj(indexArray(text))
+            .reduce(Eraser::concatenate)
             .get();
         return write(joinedText);
     }

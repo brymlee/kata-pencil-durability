@@ -110,9 +110,8 @@ public interface Pencil {
 
     default Pencil edit(final Integer startIndex,
                         final String textToEdit){
-        final Pencil pencil = this;
-        return Editor
-            .newEditor(pencil, durability())
+        final Editor editor = () -> this;
+        return editor
             .edit(startIndex, 0, durability(), textToEdit, "");
 
     }

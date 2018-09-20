@@ -1,10 +1,12 @@
 package brymlee.pencil;
 
 import brymlee.pencil.internals.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.function.Supplier;
 
 import static org.apache.commons.lang3.StringUtils.*;
+import static com.google.common.collect.FluentIterable.*;
 
 public interface Pencil {
 
@@ -55,8 +57,15 @@ public interface Pencil {
         return newPencilStatic(paper, durability, length, eraserDurability, maxDurability);
     }
 
+    default Pencil newPencil(final Integer durability,
+                             final Integer length,
+                             final Integer eraserDurability,
+                             final Integer maxDurability){
+        return newPencil(() -> "", durability, length, eraserDurability, maxDurability);
+    }
+
     default Integer newDurability(final Character character,
-                                 final Integer durability){
+                                  final Integer durability){
         if(character.toString().trim().equals("")){
             return durability;
         }else if(isNumeric(character.toString())
@@ -84,10 +93,9 @@ public interface Pencil {
         }
     }
 
-
-    default Pencil write(final String[] text){
+    default Pencil write(final List<String> text){
         final Writer writer = () -> this;
-        return writer.write(text);
+        return writer.write(from(text).toArray(String.class));
     }
 
     default Pencil sharpen(){
@@ -101,18 +109,15 @@ public interface Pencil {
     }
 
     default Pencil edit(final Integer startIndex,
-                               final String textToEdit){
+                        final String textToEdit){
         final Pencil pencil = this;
-        return new Editor(){
-            @Override
-            public Pencil pencil() {
-                return pencil;
-            }
+        return Editor
+            .newEditor(pencil, durability())
+            .edit(startIndex, 0, durability(), textToEdit, "");
 
-            @Override
-            public Integer durability() {
-                return durability();
-            }
-        }.edit(startIndex, 0, durability(), textToEdit, "");
+    }
+
+    static Pencil runWithMain(final List<String> arguments) throws InvocationTargetException, IllegalAccessException {
+        return PencilCliApplication.runWithMain(arguments);
     }
 }

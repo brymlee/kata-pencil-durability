@@ -2,6 +2,7 @@ package brymlee.pencil;
 
 import brymlee.pencil.internals.Paper;
 import org.junit.Test;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import static brymlee.pencil.Pencil.*;
@@ -9,6 +10,7 @@ import static org.junit.Assert.*;
 import static java.util.stream.IntStream.*;
 import static com.google.common.collect.FluentIterable.*;
 import static java.util.stream.Collectors.*;
+import static java.util.Arrays.*;
 
 public class PencilTest {
 
@@ -19,7 +21,7 @@ public class PencilTest {
                                                 final Integer eraserDurability,
                                                 final String ... textToWrite ){
         final Paper paper = () -> initialText;
-        final Pencil pencil = newPencilStatic(paper, durability, length, eraserDurability, durability).write(textToWrite);
+        final Pencil pencil = newPencilStatic(paper, durability, length, eraserDurability, durability).write(asList(textToWrite));
         assertEquals(assertableText, pencil.paper().text());
         return pencil;
     }
@@ -27,7 +29,7 @@ public class PencilTest {
     private static Pencil basicWritingAssertion(final Pencil pencil,
                                                 final String assertableText,
                                                 final String ... textToWrite){
-        final Pencil newPencil = pencil.write(textToWrite);
+        final Pencil newPencil = pencil.write(asList(textToWrite));
         assertEquals(assertableText, newPencil.paper().text());
         return newPencil;
     }
@@ -95,6 +97,23 @@ public class PencilTest {
     public void canPencilEditExistingTextWithoutAlwaysAppending(){
         final Pencil pencil = basicWritingAssertion("", "An       a day keeps the doctor away", 1000, 1, 0, "An       a day keeps the doctor away");
         assertEquals("An onion a day keeps the doctor away", pencil.edit(3, "onion").paper().text());
+    }
+
+    @Test
+    public void canPencilBeRunOffOfMain_createPencilThenDoBasicWrite() throws InvocationTargetException, IllegalAccessException {
+        assertEquals("hello", Pencil.runWithMain(asList("newPencil", "1000", "1", "0", "0", "and",
+                                                                 "write", "hello"))
+            .paper()
+            .text());
+    }
+
+    @Test
+    public void canPencilBeRunOffOfMain_createPencilThenDoWriteThenDoErase() throws InvocationTargetException, IllegalAccessException {
+        assertEquals("good    ", Pencil.runWithMain(asList("newPencil", "1000", "1", "10", "10", "and",
+                                                                    "write", "good job", "and",
+                                                                    "erase", "job"))
+            .paper()
+            .text());
     }
 
 }

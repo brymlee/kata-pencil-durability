@@ -1,12 +1,26 @@
 package brymlee.pencil.internals;
 
 import brymlee.pencil.Pencil;
-
 import java.util.function.Supplier;
 
 public interface Editor {
     Pencil pencil();
     Integer durability();
+
+    static Editor newEditor(final Pencil pencil,
+                            final Integer durability){
+        return new Editor() {
+            @Override
+            public Pencil pencil() {
+                return pencil;
+            }
+
+            @Override
+            public Integer durability() {
+                return durability;
+            }
+        };
+    }
 
     default Character newReplacementCharacter(final Integer startIndex,
                                               final String textToEdit,

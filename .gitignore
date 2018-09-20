@@ -1,6 +1,6 @@
 **/*.class
 **/*.swp
 .idea
-.gradle
 out
 build
+.gradle

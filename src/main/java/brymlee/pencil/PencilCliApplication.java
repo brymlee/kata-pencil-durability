@@ -19,6 +19,9 @@ public class PencilCliApplication {
     }
 
     public static Pencil runWithMain(final List<String> arguments){
+        if(!PencilMethod.NEW_PENCIL.description().equals(arguments.get(0))){
+            throw new RuntimeException("You must call newPencil when using the pencil off of the command line.");
+        }
         final List<String> methodArgumentSplit = asList(arguments.stream().reduce((i, j) -> i.concat("\t").concat(j)).get().split("and"));
         final Stream<PencilMethodComposite> incompleteCompositeStream = methodArgumentSplit
             .stream()

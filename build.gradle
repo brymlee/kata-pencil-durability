@@ -28,7 +28,7 @@ sourceSets {
 
 task fatJar(type: Jar){
     manifest {
-        attributes "Main-Class": "brymlee.wordpuzzle.WordSearchCliApplication"
+        attributes "Main-Class": "brymlee.pencil.PencilCliApplication"
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar

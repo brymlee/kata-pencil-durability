@@ -117,7 +117,7 @@ public interface Pencil {
 
     }
 
-    static Pencil runWithMain(final List<String> arguments) throws InvocationTargetException, IllegalAccessException {
+    static Pencil runWithMain(final List<String> arguments) {
         return PencilCliApplication.runWithMain(arguments);
     }
 }

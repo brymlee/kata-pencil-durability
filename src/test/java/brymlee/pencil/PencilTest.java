@@ -116,4 +116,9 @@ public class PencilTest {
             .text());
     }
 
+    @Test(expected = RuntimeException.class)
+    public void canPencilBeRunOffOfMain_newPencilMustBeCalledWhenUsingPencil(){
+        Pencil.runWithMain(asList("write", "hello"));
+    }
+
 }
